@@ -1,0 +1,36 @@
+From fbe6c47886952543840f287ce1d6a613e8cb556b Mon Sep 17 00:00:00 2001
+From: John Wason <wason@wasontech.com>
+Date: Wed, 25 Feb 2026 18:28:31 -0500
+Subject: [PATCH] Fix char16_t stream compile error on Fedora
+
+---
+ RobotRaconteurGen/CSharpServiceLangGen.cpp | 2 +-
+ RobotRaconteurGen/JavaServiceLangGen.cpp   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/RobotRaconteurGen/CSharpServiceLangGen.cpp b/RobotRaconteurGen/CSharpServiceLangGen.cpp
+index b900563c..79f380ae 100644
+--- a/RobotRaconteurGen/CSharpServiceLangGen.cpp
++++ b/RobotRaconteurGen/CSharpServiceLangGen.cpp
+@@ -2722,7 +2722,7 @@ static std::string CSharpServiceLangGen_EscapeString_Formatter(const boost::smat
+     std::basic_string<char16_t> v = boost::locale::conv::utf_to_utf<char16_t>(i);
+     BOOST_FOREACH (const char16_t& v3, v)
+     {
+-        v2 << std::setw(0) << "\\u" << std::setw(4) << v3;
++        v2 << std::setw(0) << "\\u" << std::setw(4) << static_cast<int>(v3);
+     }
+ #else
+     std::basic_string<uint16_t> v = boost::locale::conv::utf_to_utf<uint16_t>(i);
+diff --git a/RobotRaconteurGen/JavaServiceLangGen.cpp b/RobotRaconteurGen/JavaServiceLangGen.cpp
+index 4342db98..f20f0d48 100644
+--- a/RobotRaconteurGen/JavaServiceLangGen.cpp
++++ b/RobotRaconteurGen/JavaServiceLangGen.cpp
+@@ -3053,7 +3053,7 @@ static std::string JavaServiceLangGen_EscapeString_Formatter(const boost::smatch
+     std::basic_string<char16_t> v = boost::locale::conv::utf_to_utf<char16_t>(i);
+     BOOST_FOREACH (const char16_t& v3, v)
+     {
+-        v2 << std::setw(0) << "\\u" << std::setw(4) << v3;
++        v2 << std::setw(0) << "\\u" << std::setw(4) << static_cast<int>(v3);
+     }
+ #else
+     std::basic_string<uint16_t> v = boost::locale::conv::utf_to_utf<uint16_t>(i);
