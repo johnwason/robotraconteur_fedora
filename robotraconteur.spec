@@ -7,6 +7,7 @@ License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
 Source0:        RobotRaconteur-%{version}-Source.tar.gz
 Patch:         395.patch
+ExcludeArch:   s390x
 
 BuildRequires:  cmake >= 3.5.1
 BuildRequires:  boost-devel >= 1.58.0
@@ -23,6 +24,8 @@ BuildRequires:  gtest-devel
 BuildRequires:  g++
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  swig
+BuildRequires:  python3-pytest
 
 Requires:       bluez-libs
 Requires:       dbus
@@ -64,36 +67,41 @@ This package provides the RobotRaconteurGen tool.
 %prep
 %autosetup -n RobotRaconteur-%{version}-Source -p1
 
-%build
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-         -DBUILD_GEN=ON \
-         -DBUILD_PYTHON=OFF \
-         -DBUILD_PYTHON3=ON \
-         -DUSE_PREGENERATED_SOURCE=ON \
-         -DPYTHON3_EXECUTABLE=%{__python3} \
-         -DINSTALL_PYTHON3_PIP=ON \
-         -DBUILD_DOCUMENTATION=OFF \
-         -DBUILD_SHARED_LIBS=ON \
-         -DROBOTRACONTEURCORE_SOVERSION_MAJOR_ONLY=ON \
-         -DROBOTRACONTEUR_SKIP_RPATH=ON \
-         -DROBOTRACONTEUR_TESTING_DISABLE_DISCOVERY_LOOPBACK=ON \
-         -DBUILD_TESTING=OFF \
-         -DINSTALL_PYTHON3_PIP_EXTRA_ARGS="--compile --no-build-isolation \
-            --no-deps --root-user-action=ignore"
+%conf
+%cmake \
+   -DBUILD_GEN=ON \
+   -DBUILD_PYTHON=OFF \
+   -DBUILD_PYTHON3=ON \
+   -DUSE_PREGENERATED_SOURCE=OFF \
+   -DPYTHON3_EXECUTABLE=%{__python3} \
+   -DINSTALL_PYTHON3_PIP=ON \
+   -DBUILD_DOCUMENTATION=OFF \
+   -DBUILD_SHARED_LIBS=ON \
+   -DROBOTRACONTEURCORE_SOVERSION_MAJOR_ONLY=ON \
+   -DROBOTRACONTEUR_SKIP_RPATH=ON \
+   -DROBOTRACONTEUR_TESTING_DISABLE_DISCOVERY_LOOPBACK=ON \
+   -DCMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE=PRE_TEST \
+   -DBUILD_TESTING=ON \
+   -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON \
+   -DINSTALL_PYTHON3_PIP_EXTRA_ARGS="--compile --no-build-isolation \
+      --no-deps --root-user-action=ignore"
 
-make %{?_smp_mflags}
+%build
+export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$LD_LIBRARY_PATH
+%cmake_build
 
 %install
-cd build
-make install DESTDIR=%{buildroot}
+%cmake_install
+
+%check
+export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:$LD_LIBRARY_PATH
+%ctest -j1 -C Release
 
 # Move files to match Fedora packaging guidelines if needed
 
 %files -n librobotraconteurcore1
 %license LICENSE.txt
-%{_libdir}/libRobotRaconteurCore.so.*
+%{_libdir}/libRobotRaconteurCore.so.1{,.*}
 
 %files -n librobotraconteur-devel
 %license LICENSE.txt
@@ -110,7 +118,7 @@ make install DESTDIR=%{buildroot}
 %files -n robotraconteurgen
 %license LICENSE.txt
 %{_bindir}/RobotRaconteurGen
-%{_mandir}/man1/robotraconteurgen*
+%{_mandir}/man1/robotraconteurgen.1*
 
 %changelog
 * Thu Dec 18 2025 John Wason <wason@wasontech.com> - 1.2.7-1
