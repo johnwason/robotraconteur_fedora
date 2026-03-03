@@ -1,0 +1,45 @@
+name: main
+
+on:
+  push:
+  pull_request:
+  release:
+    types:
+    - created
+  workflow_dispatch:
+
+jobs:
+  build-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:rawhide
+    steps:
+    - uses: actions/checkout@v5
+    - name: dnf setup
+      run: dnf install cpio nano rpmbuild wget fedora-packager -y
+    - name: build setup
+      run: |
+        mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+        rpmdev-setuptree
+        cd ~/rpmbuild/SPECS
+        ln -s $GITHUB_WORKSPACE/robotraconteur.spec robotraconteur.spec
+        cd ~/rpmbuild/SOURCES
+        cp $GITHUB_WORKSPACE/395.patch .
+        cd ~/rpmbuild/SPECS
+        wget -P ~/rpmbuild/SOURCES https://github.com/robotraconteur/robotraconteur/releases/download/v1.2.7/RobotRaconteur-1.2.7-Source.tar.gz
+
+    - name: build deps
+      run: |
+        cd ~/rpmbuild/SPECS
+        dnf builddep robotraconteur.spec -y
+    - name: build
+      run: |
+        cd ~/rpmbuild/SPECS
+        rpmbuild -ba robotraconteur.spec
+    - name: archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: out-rpm
+        path: |
+          /root/rpmbuild/SRPMS/*
+          /root/rpmbuild/RPMS/*
+          
