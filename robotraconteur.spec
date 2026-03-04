@@ -25,41 +25,49 @@ BuildRequires:  g++
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  swig
-BuildRequires:  python3-pytest
+# Documentation
+BuildRequires:  doxygen
+BuildRequires:  python3dist(sphinx)
+BuildRequires:  python3dist(sphinx-tabs)
+#Not yet packaged
+#BuildRequires:  python3dist(sphinx-toolbox)
+BuildRequires:  python3dist(sphinx-rtd-theme)
+BuildRequires:  texinfo
 
-Requires:       bluez-libs
-Requires:       dbus
-Requires:       libusb1
-Requires:       python3-numpy
-Requires:       python3
+#Requires:       bluez-libs
+#Requires:       dbus
+#Requires:       libusb1
+#Requires:       python3-numpy
+#Requires:       python3
 
 %description
 Robot Raconteur is a communication framework for Robotics and Automation.
 
 %package -n librobotraconteurcore1
 Summary:        Robot Raconteur runtime library
-Requires:       bluez-libs, dbus, libusb1
+#Requires:       bluez-libs, dbus, libusb1
 
 %description -n librobotraconteurcore1
 This package provides the run-time library of Robot Raconteur.
 
 %package -n librobotraconteur-devel
 Summary:        Robot Raconteur development files
-Requires:       librobotraconteurcore1, robotraconteurgen boost-devel >= 1.58.0, cmake, g++, gcc, make, openssl-devel
+#Requires:       librobotraconteurcore1, robotraconteurgen boost-devel >= 1.58.0, cmake, g++, gcc, make, openssl-devel
 
 %description -n librobotraconteur-devel
 This package provides development files for Robot Raconteur.
 
 %package -n python3-robotraconteur
 Summary:        Robot Raconteur Python 3 module
-Requires:       bluez-libs, dbus, libusb1, python3-numpy, python3
+Requires:       bluez-libs, dbus, libusb1
+#, python3-numpy, python3
 
 %description -n python3-robotraconteur
 Robot Raconteur Python module. Use with python 3.
 
 %package -n robotraconteurgen
 Summary:        RobotRaconteurGen tool
-Requires:       librobotraconteurcore1
+#Requires:       librobotraconteurcore1
 
 %description -n robotraconteurgen
 This package provides the RobotRaconteurGen tool.
@@ -67,7 +75,7 @@ This package provides the RobotRaconteurGen tool.
 %prep
 %autosetup -n RobotRaconteur-%{version}-Source -p1
 
-%conf
+%build
 %cmake \
    -DBUILD_GEN=ON \
    -DBUILD_PYTHON=OFF \
@@ -75,7 +83,7 @@ This package provides the RobotRaconteurGen tool.
    -DUSE_PREGENERATED_SOURCE=OFF \
    -DPYTHON3_EXECUTABLE=%{__python3} \
    -DINSTALL_PYTHON3_PIP=ON \
-   -DBUILD_DOCUMENTATION=OFF \
+   -DBUILD_DOCUMENTATION=ON \
    -DBUILD_SHARED_LIBS=ON \
    -DROBOTRACONTEURCORE_SOVERSION_MAJOR_ONLY=ON \
    -DROBOTRACONTEUR_SKIP_RPATH=ON \
@@ -86,16 +94,20 @@ This package provides the RobotRaconteurGen tool.
    -DINSTALL_PYTHON3_PIP_EXTRA_ARGS="--compile --no-build-isolation \
       --no-deps --root-user-action=ignore"
 
-%build
 export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$LD_LIBRARY_PATH
 %cmake_build
+%cmake_build --target RobotRaconteurCore_doc
+%cmake_build --target RobotRaconteurPython3_doc
+# Missing dependency
+#cmake_build --target RobotRaconteurGettingStarted_doc
+
 
 %install
 %cmake_install
 
 %check
-export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:$LD_LIBRARY_PATH
-%ctest -j1 -C Release
+#export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:$LD_LIBRARY_PATH
+%ctest -j1
 
 # Move files to match Fedora packaging guidelines if needed
 
