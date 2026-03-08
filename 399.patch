@@ -1,0 +1,36 @@
+From 6a38c7fc925a8e275a3587ef2b2689cce872e974 Mon Sep 17 00:00:00 2001
+From: John Wason <wason@wasontech.com>
+Date: Sat, 7 Mar 2026 19:51:21 -0500
+Subject: [PATCH] Add workaround for documentation when sphinx collapse is not
+ available
+
+---
+ docs/getting_started/conf.py | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/docs/getting_started/conf.py b/docs/getting_started/conf.py
+index 9579882f..4c97cb37 100644
+--- a/docs/getting_started/conf.py
++++ b/docs/getting_started/conf.py
+@@ -15,10 +15,20 @@
+ 
+ extensions = [
+     'sphinx_rtd_theme',
+-    'sphinx_toolbox.collapse',
+     'sphinx_tabs.tabs'
+ ]
+ 
++try:
++    import sphinx_toolbox.collapse
++    extensions.append('sphinx_toolbox.collapse')
++except ImportError:
++    from docutils.parsers.rst import directives
++    from docutils.parsers.rst.directives.body import Container
++
++    def setup(app):
++        # Maps 'collapse' to the standard 'container' directive
++        app.add_directive('collapse', Container)
++
+ templates_path = ['templates']
+ exclude_patterns = []
+ 

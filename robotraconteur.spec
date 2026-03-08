@@ -7,6 +7,7 @@ License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
 Source0:        RobotRaconteur-%{version}-Source.tar.gz
 Patch:         395.patch
+Patch:         399.patch
 ExcludeArch:   s390x
 
 BuildRequires:  cmake >= 3.5.1
@@ -29,48 +30,51 @@ BuildRequires:  swig
 BuildRequires:  doxygen
 BuildRequires:  python3dist(sphinx)
 BuildRequires:  python3dist(sphinx-tabs)
-#Not yet packaged
-#BuildRequires:  python3dist(sphinx-toolbox)
 BuildRequires:  python3dist(sphinx-rtd-theme)
 BuildRequires:  texinfo
-
-#Requires:       bluez-libs
-#Requires:       dbus
-#Requires:       libusb1
-#Requires:       python3-numpy
-#Requires:       python3
 
 %description
 Robot Raconteur is a communication framework for Robotics and Automation.
 
 %package -n librobotraconteurcore1
 Summary:        Robot Raconteur runtime library
-#Requires:       bluez-libs, dbus, libusb1
+Requires:       bluez-libs, dbus, libusb1
 
 %description -n librobotraconteurcore1
 This package provides the run-time library of Robot Raconteur.
 
 %package -n librobotraconteur-devel
 Summary:        Robot Raconteur development files
-#Requires:       librobotraconteurcore1, robotraconteurgen boost-devel >= 1.58.0, cmake, g++, gcc, make, openssl-devel
+Requires:       librobotraconteurcore1, robotraconteurgen boost-devel >= 1.58.0
 
 %description -n librobotraconteur-devel
 This package provides development files for Robot Raconteur.
 
 %package -n python3-robotraconteur
 Summary:        Robot Raconteur Python 3 module
-Requires:       bluez-libs, dbus, libusb1
-#, python3-numpy, python3
 
 %description -n python3-robotraconteur
 Robot Raconteur Python module. Use with python 3.
 
 %package -n robotraconteurgen
 Summary:        RobotRaconteurGen tool
-#Requires:       librobotraconteurcore1
 
 %description -n robotraconteurgen
 This package provides the RobotRaconteurGen tool.
+
+%package -n librobotraconteur-devel-doc
+Summary: Documentation for the Robot Raconteur
+BuildArch: noarch
+
+%description -n librobotraconteur-devel-doc
+Documentation for the Robot Raconteur Core C++ Library and Getting Started Guide
+
+%package -n python3-robotraconteur-doc
+Summary: Documentation for the Robot Raconteur Python Core Library
+BuildArch: noarch
+
+%description -n python3-robotraconteur-doc
+Documentation for the Robot Raconteur Python Core Library
 
 %prep
 %autosetup -n RobotRaconteur-%{version}-Source -p1
@@ -98,15 +102,13 @@ export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$
 %cmake_build
 %cmake_build --target RobotRaconteurCore_doc
 %cmake_build --target RobotRaconteurPython3_doc
-# Missing dependency
-#cmake_build --target RobotRaconteurGettingStarted_doc
+%cmake_build --target RobotRaconteurGettingStarted_doc
 
 
 %install
 %cmake_install
 
 %check
-#export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:$LD_LIBRARY_PATH
 %ctest -j1
 
 # Move files to match Fedora packaging guidelines if needed
@@ -131,6 +133,15 @@ export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$
 %license LICENSE.txt
 %{_bindir}/RobotRaconteurGen
 %{_mandir}/man1/robotraconteurgen.1*
+
+%files -n librobotraconteur-devel-doc
+%license LICENSE.txt
+%doc %{_vpath_builddir}/docs/cpp
+%doc %{_vpath_builddir}/docs/getting_started
+
+%files -n python3-robotraconteur-doc
+%license LICENSE.txt
+%doc %{_vpath_builddir}/docs/python3
 
 %changelog
 * Thu Dec 18 2025 John Wason <wason@wasontech.com> - 1.2.7-1
