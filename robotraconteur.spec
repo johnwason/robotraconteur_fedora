@@ -5,9 +5,9 @@ Summary:        Robot Raconteur is a communication framework for Robotics and Au
 
 License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
-Source0:        RobotRaconteur-%{version}-Source.tar.gz
-Patch:         395.patch
-Patch:         399.patch
+Source:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-Source.tar.gz
+Patch:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/395.patch
+Patch:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/399.patch
 ExcludeArch:   s390x
 
 BuildRequires:  cmake >= 3.5.1
