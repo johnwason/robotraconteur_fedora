@@ -1,17 +1,15 @@
 Name:           robotraconteur
-Version:        1.2.7
+Version:        1.2.8
 Release:        1%{?dist}
 Summary:        Robot Raconteur is a communication framework for Robotics and Automation
 
 License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
 Source:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-Source.tar.gz
-Patch:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/395.patch
-Patch:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/399.patch
 ExcludeArch:   s390x
 
-BuildRequires:  cmake >= 3.5.1
-BuildRequires:  boost-devel >= 1.58.0
+BuildRequires:  cmake
+BuildRequires:  boost-devel
 BuildRequires:  bluez-libs-devel
 BuildRequires:  dbus-devel
 BuildRequires:  openssl-devel
@@ -38,26 +36,31 @@ Robot Raconteur is a communication framework for Robotics and Automation.
 
 %package -n librobotraconteurcore1
 Summary:        Robot Raconteur runtime library
-Requires:       bluez-libs, dbus, libusb1
 
 %description -n librobotraconteurcore1
 This package provides the run-time library of Robot Raconteur.
 
 %package -n librobotraconteur-devel
 Summary:        Robot Raconteur development files
-Requires:       librobotraconteurcore1, robotraconteurgen boost-devel >= 1.58.0
+Requires:       librobotraconteurcore1%{?_isa} = %{version}-%{release}
+Requires:       robotraconteurgen%{?_isa} = %{version}-%{release}
+Requires:       boost-devel
 
 %description -n librobotraconteur-devel
 This package provides development files for Robot Raconteur.
 
 %package -n python3-robotraconteur
 Summary:        Robot Raconteur Python 3 module
+Requires:       librobotraconteurcore1%{?_isa} = %{version}-%{release}
+Requires:       python3-numpy
+Requires:       python3
 
 %description -n python3-robotraconteur
 Robot Raconteur Python module. Use with python 3.
 
 %package -n robotraconteurgen
 Summary:        RobotRaconteurGen tool
+Requires:       librobotraconteurcore1%{?_isa} = %{version}-%{release}
 
 %description -n robotraconteurgen
 This package provides the RobotRaconteurGen tool.
@@ -104,6 +107,8 @@ export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$
 %cmake_build --target RobotRaconteurPython3_doc
 %cmake_build --target RobotRaconteurGettingStarted_doc
 
+rm -rf %{_vpath_builddir}/docs/**/.buildinfo
+rm -rf %{_vpath_builddir}/docs/**/.doctrees
 
 %install
 %cmake_install
@@ -144,6 +149,8 @@ export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$
 %doc %{_vpath_builddir}/docs/python3
 
 %changelog
+* Fri May 22 2026 John Wason <wason@wasontech.com> - 1.2.8-1
+- Update to upstream version 1.2.8
 * Thu Dec 18 2025 John Wason <wason@wasontech.com> - 1.2.7-1
 - Update to upstream version 1.2.7
 * Sun Aug 31 2025 John Wason <wason@wasontech.com> - 1.2.6-1
