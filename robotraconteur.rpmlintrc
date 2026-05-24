@@ -1,0 +1,4 @@
+# Suppress the case-mismatch man page warning
+Filters = [
+    "robotraconteurgen.* no-manual-page-for-binary RobotRaconteurGen"
+]

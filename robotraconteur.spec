@@ -5,8 +5,11 @@ Summary:        Robot Raconteur is a communication framework for Robotics and Au
 
 License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
-Source:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-Source.tar.gz
-ExcludeArch:   s390x
+Source0:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-Source.tar.gz
+Source1:        %{url}/releases/download/v%{version}/robotraconteur.rpmlintrc
+ExcludeArch:    s390x
+
+%global rpmlintrc %{SOURCE1}
 
 BuildRequires:  cmake
 BuildRequires:  boost-devel
@@ -24,6 +27,7 @@ BuildRequires:  g++
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  swig
+BuildRequires:  fdupes
 # Documentation
 BuildRequires:  doxygen
 BuildRequires:  python3dist(sphinx)
@@ -59,11 +63,11 @@ Requires:       python3
 Robot Raconteur Python module. Use with python 3.
 
 %package -n robotraconteurgen
-Summary:        RobotRaconteurGen tool
+Summary:        Robot Raconteur code generator tool
 Requires:       librobotraconteurcore1%{?_isa} = %{version}-%{release}
 
 %description -n robotraconteurgen
-This package provides the RobotRaconteurGen tool.
+This package provides the Robot Raconteur code generator tool.
 
 %package -n librobotraconteur-devel-doc
 Summary: Documentation for the Robot Raconteur
@@ -107,11 +111,20 @@ export LD_LIBRARY_PATH=%{_builddir}/%{?buildsubdir}/%{_vpath_builddir}/out/lib:$
 %cmake_build --target RobotRaconteurPython3_doc
 %cmake_build --target RobotRaconteurGettingStarted_doc
 
-rm -rf %{_vpath_builddir}/docs/**/.buildinfo
-rm -rf %{_vpath_builddir}/docs/**/.doctrees
-
 %install
 %cmake_install
+
+mkdir -p %{buildroot}%{_docdir}/librobotraconteur-devel-doc
+cp -a %{_vpath_builddir}/docs/cpp %{buildroot}%{_docdir}/librobotraconteur-devel-doc/
+cp -a %{_vpath_builddir}/docs/getting_started %{buildroot}%{_docdir}/librobotraconteur-devel-doc/
+
+mkdir -p %{buildroot}%{_docdir}/python3-robotraconteur-doc
+cp -a %{_vpath_builddir}/docs/python3 %{buildroot}%{_docdir}/python3-robotraconteur-doc/
+
+find %{buildroot}%{_docdir} -name ".buildinfo" -delete
+find %{buildroot}%{_docdir} -name ".doctrees" -type d -exec rm -rf {} +
+
+%fdupes %{buildroot}%{_docdir}
 
 %check
 %ctest -j1
@@ -131,6 +144,7 @@ rm -rf %{_vpath_builddir}/docs/**/.doctrees
 
 %files -n python3-robotraconteur
 %license LICENSE.txt
+%doc RobotRaconteurPython/README.md
 %{python3_sitearch}/RobotRaconteur/
 %{python3_sitearch}/robotraconteur-*.dist-info/
 
@@ -141,12 +155,11 @@ rm -rf %{_vpath_builddir}/docs/**/.doctrees
 
 %files -n librobotraconteur-devel-doc
 %license LICENSE.txt
-%doc %{_vpath_builddir}/docs/cpp
-%doc %{_vpath_builddir}/docs/getting_started
+%{_docdir}/librobotraconteur-devel-doc/
 
 %files -n python3-robotraconteur-doc
 %license LICENSE.txt
-%doc %{_vpath_builddir}/docs/python3
+%{_docdir}/python3-robotraconteur-doc/
 
 %changelog
 * Fri May 22 2026 John Wason <wason@wasontech.com> - 1.2.8-1
