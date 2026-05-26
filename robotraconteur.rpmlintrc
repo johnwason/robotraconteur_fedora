@@ -1,4 +1,2 @@
 # Suppress the case-mismatch man page warning
-Filters = [
-    "robotraconteurgen.* no-manual-page-for-binary RobotRaconteurGen"
-]
+addFilter("no-manual-page-for-binary RobotRaconteurGen")
