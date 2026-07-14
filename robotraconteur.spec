@@ -7,6 +7,8 @@ License:        Apache-2.0
 URL:            https://github.com/robotraconteur/robotraconteur
 Source0:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-Source.tar.gz
 Source1:        %{url}/releases/download/v%{version}/robotraconteur.rpmlintrc
+Patch0:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/456.patch
+Patch1:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/458.patch
 ExcludeArch:    s390x
 
 %global rpmlintrc %{SOURCE1}
@@ -140,7 +142,7 @@ find %{buildroot}%{_docdir} -name ".doctrees" -type d -exec rm -rf {} +
 %{_includedir}/RobotRaconteur.h
 %{_includedir}/RobotRaconteur/
 %{_libdir}/libRobotRaconteurCore.so
-%{_libdir}/cmake/
+%{_libdir}/cmake/RobotRaconteur
 
 %files -n python3-robotraconteur
 %license LICENSE.txt

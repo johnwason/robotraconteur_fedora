@@ -1,0 +1,67 @@
+From 6f2016b8bd6d860e562f68bb9ee8e565c48eca83 Mon Sep 17 00:00:00 2001
+From: John Wason <wason@wasontech.com>
+Date: Wed, 1 Jul 2026 18:45:10 -0400
+Subject: [PATCH] Improve compatibility with openssl4
+
+---
+ RobotRaconteurCore/src/OpenSSLAuthContext.cpp | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/RobotRaconteurCore/src/OpenSSLAuthContext.cpp b/RobotRaconteurCore/src/OpenSSLAuthContext.cpp
+index 13bfa04de..7c50c438d 100644
+--- a/RobotRaconteurCore/src/OpenSSLAuthContext.cpp
++++ b/RobotRaconteurCore/src/OpenSSLAuthContext.cpp
+@@ -21,6 +21,12 @@
+ #include "RobotRaconteurNodeRootCA.h"
+ #include <boost/shared_array.hpp>
+ 
++#if defined(OPENSSL_VERSION_MAJOR) && OPENSSL_VERSION_MAJOR >= 4
++#define OPENSSL4_CONST const
++#else
++#define OPENSSL4_CONST
++#endif
++
+ namespace RobotRaconteur
+ {
+ namespace detail
+@@ -106,8 +112,8 @@ bool verify_callback(bool preverified, boost::asio::ssl::verify_context& ctx)
+         return false;
+     }
+ 
+-    X509_NAME* sub_name = X509_get_subject_name(cert);
+-    X509_NAME* iss_name = X509_get_issuer_name(cert);
++    OPENSSL4_CONST X509_NAME* sub_name = X509_get_subject_name(cert);
++    OPENSSL4_CONST X509_NAME* iss_name = X509_get_issuer_name(cert);
+ 
+     bool isroot = false;
+ 
+@@ -124,12 +130,12 @@ bool verify_callback(bool preverified, boost::asio::ssl::verify_context& ctx)
+ 
+         for (int i = 0; i < ext_count; i++)
+         {
+-            X509_EXTENSION* e = X509_get_ext(cert, i);
++            OPENSSL4_CONST X509_EXTENSION* e = X509_get_ext(cert, i);
+             if (!e)
+                 return false;
+             if (::X509_EXTENSION_get_critical(e))
+             {
+-                ASN1_OBJECT* obj = ::X509_EXTENSION_get_object(e);
++                OPENSSL4_CONST ASN1_OBJECT* obj = ::X509_EXTENSION_get_object(e);
+                 if (!obj)
+                     return false;
+                 boost::array<char, 64> buf = {};
+@@ -483,12 +489,12 @@ bool OpenSSLAuthContext::VerifyRemoteNodeCertificate(SSL* connection, const Node
+ 
+     for (int i = 0; i < ext_count; i++)
+     {
+-        X509_EXTENSION* e = X509_get_ext(cert, i);
++        OPENSSL4_CONST X509_EXTENSION* e = X509_get_ext(cert, i);
+         if (!e)
+             return false;
+         if (::X509_EXTENSION_get_critical(e))
+         {
+-            ASN1_OBJECT* obj = ::X509_EXTENSION_get_object(e);
++            OPENSSL4_CONST ASN1_OBJECT* obj = ::X509_EXTENSION_get_object(e);
+             if (!obj)
+                 return false;
+             boost::array<char, 64> buf3 = {};
