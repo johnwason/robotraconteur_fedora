@@ -166,7 +166,9 @@ find %{buildroot}%{_docdir} -name ".doctrees" -type d -exec rm -rf {} +
 %changelog
 * Fri May 22 2026 John Wason <wason@wasontech.com> - 1.2.8-1
 - Update to upstream version 1.2.8
+
 * Thu Dec 18 2025 John Wason <wason@wasontech.com> - 1.2.7-1
 - Update to upstream version 1.2.7
+
 * Sun Aug 31 2025 John Wason <wason@wasontech.com> - 1.2.6-1
 - Test RPM Build
