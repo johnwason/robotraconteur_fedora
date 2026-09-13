@@ -9,6 +9,7 @@ Source0:        %{url}/releases/download/v%{version}/RobotRaconteur-%{version}-S
 Source1:        %{url}/releases/download/v%{version}/robotraconteur.rpmlintrc
 Patch0:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/456.patch
 Patch1:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/458.patch
+Patch2:         https://patch-diff.githubusercontent.com/raw/robotraconteur/robotraconteur/pull/470.patch
 ExcludeArch:    s390x
 
 %global rpmlintrc %{SOURCE1}

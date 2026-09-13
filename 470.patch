@@ -1,0 +1,30 @@
+From 5624f52e8636246220db16c71dd362b9fedaf866 Mon Sep 17 00:00:00 2001
+From: John Wason <wason@wasontech.com>
+Date: Sun, 30 Aug 2026 20:31:53 -0400
+Subject: [PATCH] Fix missing PyInt_AsLong in swig 4.5.0
+
+---
+ RobotRaconteurPython/PythonTypemaps.i | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/RobotRaconteurPython/PythonTypemaps.i b/RobotRaconteurPython/PythonTypemaps.i
+index 868b63d09..2fe37f182 100644
+--- a/RobotRaconteurPython/PythonTypemaps.i
++++ b/RobotRaconteurPython/PythonTypemaps.i
+@@ -62,12 +62,14 @@
+ 
+ %typemap(in) boost::posix_time::time_duration (boost::posix_time::time_duration tmpDur, int64_t pyinputval2=0, double pyinputval=0) %{
+ 
+-
++#if (PY_MAJOR_VERSION == 2)
+ 	if (PyInt_Check($input))
+ 	{
+ 		pyinputval=boost::lexical_cast<double>(PyInt_AsLong($input));
+ 	}
+-	else if (PyLong_Check($input))
++	else
++#endif
++    if (PyLong_Check($input))
+ 	{
+ 		pyinputval=boost::lexical_cast<double>(PyLong_AsLong($input));
+ 	}
